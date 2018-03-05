@@ -35,14 +35,26 @@ int main(void) {
 
   /* Attente d'une connexion client */
     while (1){
+        pid_t pid;
+        pid = fork();
+	
+	if (pid != 0)
+	  {
         csock = accept(sock, (struct sockaddr*)&csin, &crecsize);
         printf("Un client se connecte avec la socket %d de %s:%d\n",
         csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
-    
-    char buffer[32] = "Bonjour \n";
-    send(csock,buffer,32,0 );
+	
+	
+	    char buffer[32];
+	   
+	    
+	    
     recv(csock,buffer,32,0 );
     printf(buffer);
+	  }
+	    
+    
+    
     }
 
   /* Fermeture de la socket client et de la socket serveur */
