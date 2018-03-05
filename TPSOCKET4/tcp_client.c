@@ -30,13 +30,13 @@ int main(void) {
   printf("Connexion a %s sur le port %d\n", inet_ntoa(sin.sin_addr),
          htons(sin.sin_port));
   char buffer[32];
-   char *pos;
-   fgets(buffer,32,stdin);
-   pos=strchr(buffer,'\n');
-   *pos ="\0";
-    send(sock,buffer,32,0);
-    printf(buffer);
-    shutdown(sock,2);
+  char *pos;
+  printf("Entrer la chaine de caractère à envoyer au serveur \n");
+  fgets(buffer,32,stdin);
+  pos=strchr(buffer,'\n');
+  *pos ="\0";
+  send(sock,buffer,32,0);
+  shutdown(sock,2);
   /* Fermeture de la socket client */
   close(sock);
 
