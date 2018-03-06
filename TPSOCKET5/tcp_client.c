@@ -7,11 +7,22 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+
 #define PORT 10000
+int sock;
+
+void f(){
+  shutdown(sock,2);
+  /* Fermeture de la socket client */
+  close(sock);
+  kill(getpid(),SIGTERM);
+}
 
 int main(void) {
 
-  int sock;
+  //int sock;
   struct sockaddr_in sin;
 
   /* Création de la socket */
@@ -31,16 +42,14 @@ int main(void) {
          htons(sin.sin_port));
   char buffer[32];
   char *pos;
-  printf("Entrer la chaine de caractère à envoyer au serveur \n");
-  fgets(buffer,32,stdin);
-  pos=strchr(buffer,'\n');
-  *pos ="\0";
-  send(sock,buffer,32,0);
+  while(1) {
+    printf("Entrer la chaine de caractère à envoyer au serveur \n");
+    fgets(buffer,32,stdin);
+    pos=strchr(buffer,'\n');
+    *pos = "\0";
+    send(sock,buffer,32,0);
+    signal(SIGINT, f);
+  }
   
-  shutdown(sock,2);
-  /* Fermeture de la socket client */
-  close(sock);
-
-  return EXIT_SUCCESS;
 
 }//main

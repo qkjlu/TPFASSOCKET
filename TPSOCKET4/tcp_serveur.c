@@ -7,7 +7,12 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #define PORT 10000
+
+void f(){
+  wait();
+}
 
 int main(void) {
 
@@ -36,25 +41,24 @@ int main(void) {
   /* Attente d'une connexion client */
   while (1){
     pid_t pid;
+    char buffer[32] = "";
+    
+    
+    csock = accept(sock, (struct sockaddr*)&csin, &crecsize);
     pid = fork();
-	
+    
     if (pid == 0)
       {
-        csock = accept(sock, (struct sockaddr*)&csin, &crecsize);
-	char str[32];
-	strcpy("yo",str);
-	printf("%s",str);
+        //csock = accept(sock, (struct sockaddr*)&csin, &crecsize);
         printf("Un client se connecte avec la socket %d de %s:%d\n",
 	       csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
-	char buffer[32];
 	
-	recv(csock,buffer,32,0 );
-	printf(buffer);
-        
-	kill(getpid(), 9);
+        recv(csock,buffer,32,0);
+	printf("%s\n",buffer);
+	signal(SIGCHLD, f);
       }
     else {
-      wait();
+      
     }
   }
 
