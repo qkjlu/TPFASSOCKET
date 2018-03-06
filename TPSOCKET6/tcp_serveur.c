@@ -7,10 +7,32 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <pthread.h>
+
 #define PORT 10000
+#define NB_THREAD 500
+
+pthread_t threads[NB_THREAD];
+
+void* threadAction(*void arg){
+  printf("Un client se connecte avec la socket %d de %s:%d\n",
+    sock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
+     while(1){
+       recv(csock,buffer,32,0);
+       printf("%s\n",buffer);
+
+     }
+     pthread_detach();
+     
+}
+
 
 int main(void) {
+
+  // Numéro thread et erreur éventuelle à la création du thread
+  int i = 0;
+  int err;
 
   /* Socket et contexte d'adressage du serveur */
   struct sockaddr_in sin;
@@ -35,16 +57,12 @@ int main(void) {
   listen(sock, 5);
 
   /* Attente d'une connexion client */
-    while (1){
-      csock = accept(sock, (struct sockaddr*)&csin, &crecsize);
-      printf("Un client se connecte avec la socket %d de %s:%d\n",
-	     csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
-    
-      char buffer[32] = "Bonjour \n";
-      send(csock,buffer,32,0 );
-      recv(csock,buffer,32,0 );
-      printf(buffer);
-    }
+  while (i < NB_THREAD){
+    char buffer[32] = "";
+    csock = accept(sock, (struct sockaddr*)&csin, &crecsize);
+    err = pthread_create(&(threads[i]), NULL, &threadAction, NULL);
+        
+  }
 
   /* Fermeture de la socket client et de la socket serveur */
   close(csock);
