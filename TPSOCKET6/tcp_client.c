@@ -12,6 +12,7 @@
 #include <pthread.h>
 
 #define PORT 10000
+
 int sock;
 
 void f(){
@@ -22,6 +23,10 @@ void f(){
 }
 
 int main(void) {
+
+  // Numéro thread et erreur éventuelle à la création du thread
+  int i = 0;
+  int err;
 
   //int sock;
   struct sockaddr_in sin;
