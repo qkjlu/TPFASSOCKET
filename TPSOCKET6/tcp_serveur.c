@@ -1,5 +1,4 @@
 // $Id$
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -9,13 +8,16 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <pthread.h>
+#include <errno.h>
 
 #define PORT 10000
 #define NB_THREAD 500
 
 char buffer[32];
+int sock;
 
 typedef struct {
+  int *i;
   int sock;
   int csock;
   struct sockaddr_in sin;
@@ -23,24 +25,27 @@ typedef struct {
   
 } threads_args_struct;
 
-//void f(){
-  //shutdown(sock,2);
-  /* Fermeture de la socket client */
-  //close(sock);
-  //kill(getpid(),SIGTERM);
-//}
+void f(){
+  shutdown(sock,2);
+  /* Fermeture de la socket serveur */
+  close(sock);
+  kill(getpid(),SIGTERM);
+}
 
 void* threadAction(void *args){
   pthread_detach(pthread_self());
   threads_args_struct *actualArgs = args;
   printf("Un client se connecte avec la socket %d de %s:%d\n",
     actualArgs->sock, inet_ntoa(actualArgs->csin.sin_addr), htons(actualArgs->csin.sin_port));
-     while(1){
-       recv(actualArgs->csock,buffer,32,0);
-       printf("%s\n",buffer);
-       //signal(SIGINT, f);
-     }
-     
+
+  int *i = actualArgs->i;
+
+  while( recv(actualArgs->csock,buffer,32,0) != 0){
+    printf("%s\n",buffer);
+  }
+  
+  (*i)--;
+  
      
 }
 
@@ -75,7 +80,11 @@ int main(void) {
   bind(sock, (struct sockaddr*)&sin, recsize);
 
   /* Démarrage du listage (mode server) */
-  listen(sock, 5);
+  while(listen(sock, 5) != 0){
+    printf("Erreur au lancement de l'écoute - Code erreur : %s\n",strerror(errno));
+    printf("Lancement d'une autre tentative dans 2 secondes\n");
+    sleep(2);
+  }
 
   /* Attente d'une connexion client */
   while (i < NB_THREAD){
@@ -86,7 +95,13 @@ int main(void) {
     args->csock = csock;
     args->sin = sin;
     args->csin = csin;
+    args->i = &i;
     err = pthread_create(&(threads[i]), NULL, &threadAction, args);
+    if (err != 0){
+      printf("Erreur à la création du thread\n");
+    }
+    i++;
+    signal(SIGINT,f);
         
   }
 

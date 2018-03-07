@@ -10,6 +10,7 @@
 #include <string.h>
 #include <signal.h>
 #include <pthread.h>
+#include <errno.h>
 
 #define PORT 10000
 
@@ -23,10 +24,6 @@ void f(){
 }
 
 int main(void) {
-
-  // Numéro thread et erreur éventuelle à la création du thread
-  int i = 0;
-  int err;
 
   //int sock;
   struct sockaddr_in sin;
@@ -42,8 +39,13 @@ int main(void) {
   sin.sin_port = htons(PORT);
  
   /* Tentative de connexion au serveur */
-  connect(sock, (struct sockaddr*)&sin, sizeof(sin));
- 
+  while(connect(sock, (struct sockaddr*)&sin, sizeof(sin)) != 0){
+    
+    printf("La connection a échoué - Code erreur : %s\n",strerror(errno));
+    printf("Lancement d'une autre tentative dans 2 secondes\n");
+    sleep(2);
+  }
+  
   printf("Connexion a %s sur le port %d\n", inet_ntoa(sin.sin_addr),
          htons(sin.sin_port));
   char buffer[32];
@@ -51,8 +53,8 @@ int main(void) {
   while(1) {
     printf("Entrer la chaine de caractère à envoyer au serveur \n");
     fgets(buffer,32,stdin);
-    pos=strchr(buffer,'\n');
-    *pos = "\0";
+    //pos=strchr(buffer,'\n');
+    //*pos = "\0";
     send(sock,buffer,32,0);
     signal(SIGINT, f);
   }

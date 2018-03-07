@@ -6,8 +6,8 @@ OBJ=$(FILES:%.c=%.o)
 BIN=tcp_serveur tcp_client
 
 all: $(OBJ)
-	$(GCC) -o tcp_serveur tcp_serveur.o
-	$(GCC) -o tcp_client tcp_client.o
+	$(GCC) -o tcp_serveur tcp_serveur.o -lpthread 
+	$(GCC) -o tcp_client tcp_client.o -lpthread 
 
 clean:
 	rm -f *~ *.o $(BIN)
