@@ -1,0 +1,4 @@
+Il faut exécuter le serveur en premier, avant le client.
+
+On peut exécuter un seul client et un seul serveur.
+

@@ -1,0 +1,5 @@
+On utilise un thread plutôt qu'un fork, donc cela signifie que
+les variables du programme sont partagées par tout les thread créé,
+quand un thread modifie une variable, elle est modifé pour tout
+les autres thread découlant du processus, il faut donc faire attention
+si il y a une section critique.

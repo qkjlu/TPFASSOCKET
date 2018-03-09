@@ -7,16 +7,17 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+#include <string.h>
 #define PORT 10000
 
 int main(void) {
-
+  
   /* Socket et contexte d'adressage du serveur */
   struct sockaddr_in sin;
   int sock;
   socklen_t recsize = sizeof(sin);
-    
+  char buffer[32];
+  
   /* Socket et contexte d'adressage du client */
   struct sockaddr_in csin;
   int csock;
@@ -35,20 +36,23 @@ int main(void) {
   listen(sock, 5);
 
   /* Attente d'une connexion client */
-    while (1){
-      csock = accept(sock, (struct sockaddr*)&csin, &crecsize);
-      printf("Un client se connecte avec la socket %d de %s:%d\n",
-	     csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
-    
-      char buffer[32] = "Bonjour \n";
-      send(csock,buffer,32,0 );
-      recv(csock,buffer,32,0 );
-      printf(buffer);
-    }
+  csock = accept(sock, (struct sockaddr*)&csin, &crecsize);
+  
+  printf("Un client se connecte avec la socket %d de %s:%d\n",
+         csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
 
+  /* Envoi de données au client */
+  strcpy(buffer,"Bonjour ! \n");
+  send(csock,buffer,sizeof(buffer),0);
+
+  /* Réception de données en provenance du client */
+  recv(csock,buffer,32,0 );
+  printf("%s \n",buffer);
+  
   /* Fermeture de la socket client et de la socket serveur */
   close(csock);
   close(sock);
+
   return EXIT_SUCCESS;
 
 }//main

@@ -1,0 +1,4 @@
+Pour faire fonctionner son client et son serveur avec le groupe d'à côté il faut
+modifier l'addresse IP à laquelle le client se connecte.
+
+On modifie la variable sin.sin_addr.s_addr.

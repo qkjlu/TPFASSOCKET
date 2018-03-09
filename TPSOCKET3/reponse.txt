@@ -1,0 +1,2 @@
+Le problème est que la connexion avec le client est écrasée si un nouveau
+client tente de se connecter, le serveur ne peut pas gérer de multiple connexions.
